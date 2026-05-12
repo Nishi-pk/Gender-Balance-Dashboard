@@ -5,403 +5,469 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UAE Gender Balance Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #f5f7fa;
-    --surface: #ffffff;
-    --surface2: #f0f4f9;
-    --border: #dde4ef;
-    --blue-1: #0d3b8e;
-    --blue-2: #1a5fbc;
-    --blue-3: #2e80d4;
-    --blue-4: #5aa8e8;
-    --blue-5: #9ccbf4;
-    --text: #1a2340;
-    --muted: #7a8aaa;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+:root {
+  --bg:#f5f7fa; --surface:#fff; --surface2:#f0f4f9; --border:#dde4ef;
+  --b1:#0d3b8e; --b2:#1a5fbc; --b3:#2e80d4; --b4:#5aa8e8; --b5:#9ccbf4;
+  --text:#1a2340; --muted:#7a8aaa; --green:#15803d; --red:#c0392b;
+  --font-body: 'Sakkal Majalla', 'Calibri', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
+  --font-head: 'Sakkal Majalla', 'Calibri', 'Gill Sans MT', 'Trebuchet MS', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
 
-  /* HEADER */
-  .header {
-    background: linear-gradient(135deg, #0a2560 0%, #0d3b8e 55%, #1a5fbc 100%);
-    padding: 26px 36px;
-    display: flex; align-items: center; gap: 14px;
-    position: relative; overflow: hidden;
-    box-shadow: 0 4px 24px rgba(13,59,142,0.2);
-  }
-  .header::after {
-    content: ''; position: absolute; top: -60px; right: -60px;
-    width: 360px; height: 360px;
-    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .header::before {
-    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, #00843D 0%, #ffffff 50%, #ef4135 100%);
-  }
-  .flag-block { display: flex; gap: 3px; flex-shrink: 0; align-items: stretch; }
-  .flag-block .red  { width: 6px; height: 46px; background: #ef4135; border-radius: 3px; }
-  .flag-block .stripes { display: flex; flex-direction: column; gap: 0; width: 6px; height: 46px; border-radius: 3px; overflow: hidden; }
-  .flag-block .stripes div { flex: 1; }
-  .flag-block .stripes .g { background: #00843D; }
-  .flag-block .stripes .w { background: #fff; }
-  .flag-block .stripes .b { background: #111; }
-  .header-text h1 { font-family: 'Syne', sans-serif; font-size: 21px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
-  .header-text p  { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 3px; font-weight: 300; }
-  .header-badge {
-    margin-left: auto;
-    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
-    color: #fff; font-size: 10px; font-weight: 700; padding: 5px 14px;
-    border-radius: 20px; letter-spacing: 1px; text-transform: uppercase;
-  }
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#0a2560,#0d3b8e 55%,#1a5fbc);padding:22px 36px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;box-shadow:0 4px 24px rgba(13,59,142,.2)}
+.hdr::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00843D,#fff 50%,#ef4135)}
+.hdr::after{content:'';position:absolute;top:-60px;right:-60px;width:360px;height:360px;background:radial-gradient(circle,rgba(255,255,255,.07),transparent 60%);pointer-events:none}
+.flag{display:flex;gap:3px;flex-shrink:0}
+.flag .r{width:6px;height:44px;background:#ef4135;border-radius:3px}
+.flag .s{display:flex;flex-direction:column;width:6px;height:44px;border-radius:3px;overflow:hidden}
+.flag .s div{flex:1}
+.flag .s .g{background:#00843D}.flag .s .w{background:#fff}.flag .s .b{background:#111}
+.hdr-txt{margin-left:6px}
+.hdr-txt h1{font-family:var(--font-head);font-size:20px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.hdr-txt p{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;font-weight:300}
+.hdr-badge{margin-left:auto;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;font-size:10px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase}
 
-  /* STAT PILLS */
-  .stat-pills { display: flex; gap: 14px; padding: 20px 36px 0; flex-wrap: wrap; }
-  .stat-pill {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-    padding: 16px 22px; display: flex; align-items: center; gap: 14px;
-    box-shadow: 0 2px 10px rgba(13,59,142,0.07);
-    transition: box-shadow 0.2s, transform 0.2s;
-  }
-  .stat-pill:hover { box-shadow: 0 6px 20px rgba(13,59,142,0.13); transform: translateY(-2px); }
-  .pill-icon {
-    width: 48px; height: 48px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
-  }
-  .pill-icon.r { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
-  .pill-icon.i { background: linear-gradient(135deg, #e0f2fe, #bae6fd); }
-  .pill-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--blue-1); line-height: 1; }
-  .pill-lbl { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.6px; text-transform: uppercase; margin-top: 3px; }
+/* TABS */
+.tabs{display:flex;gap:0;padding:20px 36px 0;border-bottom:2px solid var(--border);background:var(--surface)}
+.tab{padding:12px 24px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .2s,border-color .2s;border-radius:8px 8px 0 0;user-select:none;font-family:var(--font-body)}
+.tab:hover{color:var(--b1)}
+.tab.active{color:var(--b1);border-bottom-color:var(--b1);background:var(--bg)}
+.tab-icon{margin-right:6px}
 
-  /* FILTERS */
-  .filters {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-    margin: 16px 36px 0; padding: 18px 24px;
-    display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;
-    box-shadow: 0 2px 8px rgba(13,59,142,0.05);
-  }
-  .filter-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
-  .filter-group label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
-  .filter-group select {
-    background: var(--surface2); border: 1.5px solid var(--border); color: var(--text);
-    padding: 10px 34px 10px 14px; border-radius: 10px;
-    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-    cursor: pointer; outline: none; appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a8aaa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .filter-group select:focus { border-color: var(--blue-1); box-shadow: 0 0 0 3px rgba(13,59,142,0.1); }
+/* PANELS */
+.panel{display:none}.panel.active{display:block}
 
-  /* KPI ROW */
-  .kpi-row { display: flex; gap: 14px; padding: 16px 36px 0; flex-wrap: wrap; }
-  .kpi-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 16px 18px; flex: 1; min-width: 130px; position: relative; overflow: hidden;
-    box-shadow: 0 2px 8px rgba(13,59,142,0.05);
-    transition: box-shadow 0.2s, transform 0.2s;
-  }
-  .kpi-card:hover { box-shadow: 0 5px 18px rgba(13,59,142,0.1); transform: translateY(-1px); }
-  .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 14px 14px 0 0; }
-  .kpi-card.c1::before { background: var(--blue-1); }
-  .kpi-card.c2::before { background: var(--blue-2); }
-  .kpi-card.c3::before { background: var(--blue-3); }
-  .kpi-card.c4::before { background: var(--blue-4); }
-  .kpi-card.c5::before { background: var(--blue-5); }
-  .kpi-label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-  .kpi-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; line-height: 1; }
-  .kpi-card.c1 .kpi-value { color: var(--blue-1); }
-  .kpi-card.c2 .kpi-value { color: var(--blue-2); }
-  .kpi-card.c3 .kpi-value { color: var(--blue-3); }
-  .kpi-card.c4 .kpi-value { color: var(--blue-4); }
-  .kpi-card.c5 .kpi-value { color: #3a8fd4; }
-  .kpi-meta { font-size: 11px; color: var(--muted); margin-top: 5px; }
-  .kpi-diff { font-size: 11px; font-weight: 600; margin-top: 3px; }
-  .kpi-diff.pos { color: #15803d; } .kpi-diff.neg { color: #c0392b; } .kpi-diff.neu { color: var(--muted); }
+/* STAT PILLS */
+.pills{display:flex;gap:14px;padding:20px 36px 0;flex-wrap:wrap}
+.pill{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(13,59,142,.07);transition:box-shadow .2s,transform .2s;cursor:default}
+.pill:hover{box-shadow:0 6px 20px rgba(13,59,142,.13);transform:translateY(-2px)}
+.pill-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.pi-r{background:linear-gradient(135deg,#dbeafe,#bfdbfe)}
+.pi-i{background:linear-gradient(135deg,#e0f2fe,#bae6fd)}
+.pi-y{background:linear-gradient(135deg,#fef9c3,#fde68a)}
+.pill-num{font-family:var(--font-head);font-size:30px;font-weight:800;color:var(--b1);line-height:1}
+.pill-lbl{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-top:3px}
 
-  /* CHARTS */
-  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 36px 36px; }
-  @media (max-width: 860px) {
-    .charts-grid { grid-template-columns: 1fr; }
-    .filters, .kpi-row, .charts-grid, .stat-pills { padding-left: 16px; padding-right: 16px; }
-    .header { padding: 16px; }
-    .filters { margin-left: 16px; margin-right: 16px; }
-  }
-  .chart-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-    padding: 24px; box-shadow: 0 2px 12px rgba(13,59,142,0.06);
-  }
-  .chart-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-  .chart-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.45; }
-  .chart-wrap { position: relative; height: 300px; }
+/* FILTERS */
+.filters{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:16px 36px 0;padding:16px 22px;display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;box-shadow:0 2px 8px rgba(13,59,142,.05)}
+.fg{display:flex;flex-direction:column;gap:5px;flex:1;min-width:180px}
+.fg label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.fg select{background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:9px 32px 9px 12px;border-radius:9px;font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a8aaa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s,box-shadow .2s}
+.fg select:focus{border-color:var(--b1);box-shadow:0 0 0 3px rgba(13,59,142,.1)}
 
-  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); font-weight: 500; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+/* KPI ROW */
+.kpi-row{display:flex;gap:12px;padding:14px 36px 0;flex-wrap:wrap}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px 16px;flex:1;min-width:120px;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(13,59,142,.05);transition:box-shadow .2s,transform .2s}
+.kpi:hover{box-shadow:0 5px 18px rgba(13,59,142,.1);transform:translateY(-1px)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:13px 13px 0 0}
+.kpi.c1::before{background:var(--b1)}.kpi.c2::before{background:var(--b2)}.kpi.c3::before{background:var(--b3)}.kpi.c4::before{background:var(--b4)}.kpi.c5::before{background:var(--b5)}.kpi.c6::before{background:#7c3aed}
+.kpi-lbl{font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.kpi-val{font-family:var(--font-head);font-size:24px;font-weight:800;line-height:1}
+.kpi.c1 .kpi-val{color:var(--b1)}.kpi.c2 .kpi-val{color:var(--b2)}.kpi.c3 .kpi-val{color:var(--b3)}.kpi.c4 .kpi-val{color:var(--b4)}.kpi.c5 .kpi-val{color:#3a8fd4}.kpi.c6 .kpi-val{color:#7c3aed}
+.kpi-meta{font-size:10.5px;color:var(--muted);margin-top:4px}
+.kpi-diff{font-size:10.5px;font-weight:600;margin-top:3px}
+.kpi-diff.pos{color:var(--green)}.kpi-diff.neg{color:var(--red)}.kpi-diff.neu{color:var(--muted)}
 
-  .no-data { display: flex; align-items: center; justify-content: center; height: 300px; color: var(--muted); font-size: 13px; flex-direction: column; gap: 8px; }
-  .no-data span { font-size: 28px; }
+/* RANK BADGE inside KPI */
+.rank-badge{display:inline-flex;align-items:center;gap:5px;margin-top:5px}
+.rank-of{font-size:11px;color:var(--muted);font-weight:600;margin-left:2px;margin-top:2px}
+.rank-num{font-family:var(--font-head);font-size:22px;font-weight:800;color:#7c3aed}
+.rank-prev{font-size:10px;color:var(--muted)}
+.rank-arrow{font-size:11px;font-weight:700}
+.rank-arrow.up{color:var(--green)}.rank-arrow.down{color:var(--red)}.rank-arrow.same{color:var(--muted)}
 
-  .footer { text-align: center; padding: 16px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); background: var(--surface); margin-top: 0; }
+/* CHARTS GRID */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 36px 0}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:22px;box-shadow:0 2px 12px rgba(13,59,142,.06)}
+.chart-title{font-family:var(--font-head);font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.chart-sub{font-size:11.5px;color:var(--muted);margin-bottom:18px;line-height:1.45}
+.chart-wrap{position:relative;height:280px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.li{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--muted);font-weight:500}
+.ld{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.no-data{display:flex;align-items:center;justify-content:center;height:280px;color:var(--muted);font-size:13px;flex-direction:column;gap:8px}
+.no-data span{font-size:26px}
+
+/* INFO CARD (description + firsts) */
+.info-strip{margin:16px 36px 0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 22px;box-shadow:0 2px 8px rgba(13,59,142,.05)}
+.info-strip h4{font-family:var(--font-head);font-size:12px;font-weight:700;color:var(--b1);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.info-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.firsts{display:flex;gap:10px;flex-wrap:wrap}
+.first-badge{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px}
+.first-badge span{font-weight:700;color:var(--b1);display:block;font-size:10px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:1px}
+
+/* ── TAB 2: DETAILS TABLE ── */
+.tbl-controls{display:flex;gap:14px;padding:20px 36px 0;flex-wrap:wrap;align-items:flex-end}
+.search-wrap{flex:1;min-width:200px;display:flex;flex-direction:column;gap:5px}
+.search-wrap label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.search-wrap input{background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:9px 12px;border-radius:9px;font-family:var(--font-body);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+.search-wrap input:focus{border-color:var(--b1);box-shadow:0 0 0 3px rgba(13,59,142,.1)}
+.tbl-wrap{margin:16px 36px 30px;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(13,59,142,.06)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead{background:linear-gradient(135deg,#0d3b8e,#1a5fbc);color:#fff}
+thead th{padding:12px 14px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;white-space:nowrap}
+thead th.num{text-align:center}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:hover{background:#f0f6ff}
+tbody tr:last-child{border-bottom:none}
+td{padding:11px 14px;vertical-align:middle}
+td.num{text-align:center}
+.tbl-report{font-size:10.5px;color:var(--muted);font-weight:500}
+.tbl-indicator{font-weight:600;color:var(--text);line-height:1.35}
+.score-chip{display:inline-block;background:linear-gradient(135deg,#e8f0fe,#c7d9fa);color:var(--b1);font-family:var(--font-head);font-weight:700;font-size:12px;padding:3px 10px;border-radius:20px}
+.rank-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-head);font-weight:700;font-size:12px;color:#7c3aed;background:#f3f0ff;padding:3px 10px;border-radius:20px}
+.rank-chg{font-size:10px;font-weight:600}
+.rank-chg.up{color:var(--green)}.rank-chg.down{color:var(--red)}.rank-chg.same{color:var(--muted)}
+.first-cell{font-size:11px;color:var(--text);font-weight:500}
+.first-cell .flag-tag{font-size:10px;color:var(--muted);display:block}
+.year-chip{background:#f0f4f9;color:var(--muted);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:10px}
+.no-rows{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+
+/* FOOTER */
+.footer{text-align:center;padding:14px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);background:var(--surface);margin-top:16px}
+
+@media(max-width:860px){
+  .charts-grid{grid-template-columns:1fr;padding:16px}
+  .pills,.kpi-row,.filters,.tbl-controls,.tbl-wrap,.info-strip{padding-left:16px;padding-right:16px}
+  .filters{margin-left:16px;margin-right:16px}
+  .tbl-wrap{margin-left:16px;margin-right:16px}
+  .hdr{padding:16px}
+  .tabs{padding:16px 16px 0}
+}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="flag-block">
-    <div class="red"></div>
-    <div class="stripes"><div class="g"></div><div class="w"></div><div class="b"></div></div>
+<div class="hdr">
+  <div class="flag">
+    <div class="r"></div>
+    <div class="s"><div class="g"></div><div class="w"></div><div class="b"></div></div>
   </div>
-  <div class="header-text" style="margin-left:6px;">
+  <div class="hdr-txt">
     <h1>🇦🇪 UAE Gender Balance Dashboard</h1>
     <p>Benchmarking UAE against G7 · G20 · GCC · World Averages across international gender indicators</p>
   </div>
-  <div class="header-badge">Live Data</div>
+  <div class="hdr-badge">Live Data</div>
 </div>
 
-<div class="stat-pills">
-  <div class="stat-pill">
-    <div class="pill-icon r">📋</div>
-    <div>
-      <div class="pill-num" id="countReports">—</div>
-      <div class="pill-lbl">Reports Tracked</div>
-    </div>
-  </div>
-  <div class="stat-pill">
-    <div class="pill-icon i">📊</div>
-    <div>
-      <div class="pill-num" id="countIndicators">—</div>
-      <div class="pill-lbl">Total Indicators</div>
-    </div>
+<!-- TABS -->
+<div style="background:var(--surface)">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('dashboard')"><span class="tab-icon">📊</span>Dashboard</div>
+    <div class="tab" onclick="switchTab('details')"><span class="tab-icon">📋</span>Indicator Details</div>
   </div>
 </div>
 
-<div class="filters">
-  <div class="filter-group">
-    <label>📁 Report</label>
-    <select id="reportFilter" onchange="onReportChange()"></select>
+<!-- ══════════════════════════════════════════════════
+     TAB 1: DASHBOARD
+════════════════════════════════════════════════════ -->
+<div id="panel-dashboard" class="panel active">
+
+  <div class="pills">
+    <div class="pill"><div class="pill-icon pi-r">📋</div><div><div class="pill-num" id="cR">—</div><div class="pill-lbl">Reports</div></div></div>
+    <div class="pill"><div class="pill-icon pi-i">📊</div><div><div class="pill-num" id="cI">—</div><div class="pill-lbl">Indicators</div></div></div>
+    <div class="pill"><div class="pill-icon pi-y">🌍</div><div><div class="pill-num" id="cC">—</div><div class="pill-lbl">Countries</div></div></div>
   </div>
-  <div class="filter-group">
-    <label>🔍 Indicator</label>
-    <select id="indicatorFilter" onchange="onIndicatorChange()"></select>
+
+  <div class="filters">
+    <div class="fg"><label>📁 Report</label><select id="rSel" onchange="onReport()"></select></div>
+    <div class="fg"><label>🔍 Indicator</label><select id="iSel" onchange="render()"></select></div>
   </div>
+
+  <!-- KPI ROW: UAE Score | G7 | G20 | GCC | World | UAE Rank -->
+  <div class="kpi-row">
+    <div class="kpi c1"><div class="kpi-lbl">🇦🇪 UAE Score</div><div class="kpi-val" id="k-uae">—</div><div class="kpi-meta" id="k-yr"></div></div>
+    <div class="kpi c2"><div class="kpi-lbl">G7 Average</div><div class="kpi-val" id="k-g7">—</div><div class="kpi-diff" id="d-g7"></div></div>
+    <div class="kpi c3"><div class="kpi-lbl">G20 Average</div><div class="kpi-val" id="k-g20">—</div><div class="kpi-diff" id="d-g20"></div></div>
+    <div class="kpi c4"><div class="kpi-lbl">GCC Average</div><div class="kpi-val" id="k-gcc">—</div><div class="kpi-diff" id="d-gcc"></div></div>
+    <div class="kpi c5"><div class="kpi-lbl">World Average</div><div class="kpi-val" id="k-wld">—</div><div class="kpi-diff" id="d-wld"></div></div>
+    <div class="kpi c6">
+      <div class="kpi-lbl">🏆 UAE Global Rank</div>
+      <div class="rank-badge">
+        <div class="rank-num" id="k-rank">—</div>
+        <div class="rank-of" id="k-rank-of"></div>
+        <div>
+          <div class="rank-arrow" id="rank-arrow"></div>
+          <div class="rank-prev" id="rank-prev"></div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi" style="--accent:#0369a1;flex:1;min-width:120px;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px 16px;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(13,59,142,.05)">
+      <div style="content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:13px 13px 0 0;background:#0369a1"></div>
+      <div class="kpi-lbl">🌍 Countries in Report</div>
+      <div class="kpi-val" id="k-ctry" style="color:#0369a1;font-family:var(--font-head)">—</div>
+      <div class="kpi-meta" id="k-ctry-lbl">for selected report</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Score Comparison</div>
+      <div class="chart-sub" id="bar-sub">UAE vs benchmark groups</div>
+      <div class="chart-wrap"><canvas id="barC"></canvas><div class="no-data" id="barND" style="display:none"><span>📊</span>No data</div></div>
+      <div class="legend">
+        <div class="li"><div class="ld" style="background:#0d3b8e"></div>UAE</div>
+        <div class="li"><div class="ld" style="background:#1a5fbc"></div>G7</div>
+        <div class="li"><div class="ld" style="background:#2e80d4"></div>G20</div>
+        <div class="li"><div class="ld" style="background:#5aa8e8"></div>GCC</div>
+        <div class="li"><div class="ld" style="background:#9ccbf4"></div>World</div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">UAE Trend Over Time</div>
+      <div class="chart-sub" id="trnd-sub">Historical UAE score for selected indicator</div>
+      <div class="chart-wrap"><canvas id="trnC"></canvas><div class="no-data" id="trnND" style="display:none"><span>📈</span>Not enough trend data</div></div>
+      <div class="legend"><div class="li"><div class="ld" style="background:#0d3b8e;border-radius:50%"></div>UAE Score</div></div>
+    </div>
+  </div>
+
+  <!-- DESCRIPTION + FIRSTS STRIP -->
+  <div class="info-strip">
+    <h4>ℹ️ About this indicator</h4>
+    <div class="info-desc" id="info-desc">Select an indicator to see details.</div>
+    <div class="firsts" id="info-firsts"></div>
+  </div>
+
+  <div class="footer">Sources: Women Business &amp; the Law · Global Gender Gap Report · Social Progress Index · and more &nbsp;|&nbsp; Gender Balance Council UAE</div>
 </div>
 
-<div class="kpi-row">
-  <div class="kpi-card c1">
-    <div class="kpi-label">🇦🇪 UAE Score</div>
-    <div class="kpi-value" id="kpi-uae">—</div>
-    <div class="kpi-meta" id="kpi-year">Latest year</div>
+<!-- ══════════════════════════════════════════════════
+     TAB 2: INDICATOR DETAILS TABLE
+════════════════════════════════════════════════════ -->
+<div id="panel-details" class="panel">
+  <div class="tbl-controls">
+    <div class="fg" style="max-width:260px"><label>📁 Filter by Report</label><select id="tblRSel" onchange="renderTable()"></select></div>
+    <div class="search-wrap"><label>🔍 Search Indicator</label><input type="text" id="tblSearch" placeholder="Type to search..." oninput="renderTable()"></div>
   </div>
-  <div class="kpi-card c2">
-    <div class="kpi-label">G7 Average</div>
-    <div class="kpi-value" id="kpi-g7">—</div>
-    <div class="kpi-diff" id="kpi-diff-g7"></div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Report · Indicator</th>
+          <th class="num">Year</th>
+          <th class="num">Score</th>
+          <th class="num">Rank</th>
+          <th class="num">vs Prev</th>
+          <th>🌐 First Globally</th>
+          <th>🌍 First Arab</th>
+          <th>🇦🇪 First GCC</th>
+          <th>🏭 First G20</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
   </div>
-  <div class="kpi-card c3">
-    <div class="kpi-label">G20 Average</div>
-    <div class="kpi-value" id="kpi-g20">—</div>
-    <div class="kpi-diff" id="kpi-diff-g20"></div>
-  </div>
-  <div class="kpi-card c4">
-    <div class="kpi-label">GCC Average</div>
-    <div class="kpi-value" id="kpi-gcc">—</div>
-    <div class="kpi-diff" id="kpi-diff-gcc"></div>
-  </div>
-  <div class="kpi-card c5">
-    <div class="kpi-label">World Average</div>
-    <div class="kpi-value" id="kpi-world">—</div>
-    <div class="kpi-diff" id="kpi-diff-world"></div>
-  </div>
-</div>
-
-<div class="charts-grid">
-  <div class="chart-card">
-    <div class="chart-title">Score Comparison</div>
-    <div class="chart-subtitle" id="bar-subtitle">UAE vs benchmark groups</div>
-    <div class="chart-wrap">
-      <canvas id="barChart"></canvas>
-      <div class="no-data" id="barNoData" style="display:none"><span>📊</span>No data available</div>
-    </div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#0d3b8e"></div>UAE</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#1a5fbc"></div>G7</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#2e80d4"></div>G20</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#5aa8e8"></div>GCC</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#9ccbf4"></div>World</div>
-    </div>
-  </div>
-
-  <div class="chart-card">
-    <div class="chart-title">UAE Trend Over Time</div>
-    <div class="chart-subtitle" id="trend-subtitle">Historical score trajectory for selected indicator</div>
-    <div class="chart-wrap">
-      <canvas id="trendChart"></canvas>
-      <div class="no-data" id="trendNoData" style="display:none"><span>📈</span>Insufficient trend data</div>
-    </div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#0d3b8e;border-radius:50%"></div>UAE Score</div>
-    </div>
-  </div>
-</div>
-
-<div class="footer">
-  Sources: Women Business &amp; the Law · Global Gender Gap Report · Social Progress Index · Gender Inequality Index · and more &nbsp;|&nbsp; Gender Balance Council UAE
+  <div class="footer">All data reflects the latest available year for UAE per indicator.</div>
 </div>
 
 <script>
-const DATA = {"bar_data":{"Women, Business and the Law":{"Is there legislation on sexual harassment in employment?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.941,"GCC_avg":0.833,"World_avg":0.795},"Can a woman sign a contract in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.989},"Can a woman work at night in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.667,"World_avg":0.895},"Can a woman get a job in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":0.5,"World_avg":0.9},"Does the law prohibit discrimination in employment based on gender?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":0.667,"World_avg":0.853},"Can a woman choose where to live in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.167,"World_avg":0.821},"Does the law prohibit discrimination in access to credit based on gender?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.647,"GCC_avg":0.5,"World_avg":0.495},"Do sons and daughters have equal rights to inherit assets from their parents?":{"latest_year":2024,"UAE":0.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":0.0,"World_avg":0.784},"Are there criminal penalties or civil remedies for sexual harassment in employment?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.882,"GCC_avg":0.667,"World_avg":0.737},"Can a woman work in a job deemed dangerous in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.765,"GCC_avg":0.667,"World_avg":0.763},"Does the law provide for the valuation of nonmonetary contributions?":{"latest_year":2024,"UAE":0.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":0.0,"World_avg":0.705},"Is paid leave of at least 14 weeks available to mothers?":{"latest_year":2024,"UAE":0.0,"G7_avg":0.857,"G20_avg":0.706,"GCC_avg":0.167,"World_avg":0.647},"Can a woman register a business in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.974},"Is there paid leave available to fathers?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.667,"World_avg":0.647},"Does a woman have the same rights to remarry as a man?":{"latest_year":2024,"UAE":0.0,"G7_avg":0.714,"G20_avg":0.765,"GCC_avg":0.0,"World_avg":0.647},"Can a woman travel outside the country in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.5,"World_avg":0.947},"Does the government administer 100% of maternity leave benefits?":{"latest_year":2024,"UAE":0.0,"G7_avg":0.857,"G20_avg":0.765,"GCC_avg":0.0,"World_avg":0.511},"Can a woman apply for a passport in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.858},"Do men and women have equal ownership rights to immovable property?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.9},"Is the law free of legal provisions that require a married woman to obey her husband?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.333,"World_avg":0.905},"Is dismissal of pregnant workers prohibited?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.667,"World_avg":0.811},"Is there legislation specifically addressing domestic violence?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":0.667,"World_avg":0.868},"Can a woman obtain a judgment of divorce in the same way as a man?":{"latest_year":2024,"UAE":0.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":0.0,"World_avg":0.763},"Do male and female surviving spouses have equal rights to inherit assets?":{"latest_year":2024,"UAE":0.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":0.0,"World_avg":0.774},"Is the age at which men and women can retire with full pension benefits the same?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.765,"GCC_avg":0.667,"World_avg":0.674},"Is the mandatory retirement age for men and women the same?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":1.0,"World_avg":0.921},"Can a woman be head of household in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.833,"World_avg":0.853},"Are periods of absence due to childcare accounted for in pension benefits?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.588,"GCC_avg":0.5,"World_avg":0.574},"Can a woman open a bank account in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.968},"Can a woman work in an industrial job in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.706,"GCC_avg":0.833,"World_avg":0.689},"Can a woman travel outside her home in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":0.333,"World_avg":0.926},"Does the law grant spouses equal administrative authority over assets during marriage?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.905},"Does the law mandate equal remuneration for work of equal value?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.714,"G20_avg":0.529,"GCC_avg":0.5,"World_avg":0.516},"Is the age at which men and women can retire with partial pension benefits the same?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.833,"World_avg":0.811},"Is there paid parental leave?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.588,"GCC_avg":0.167,"World_avg":0.289}},"Future Readiness Economic Index":{"Gender parity in internet usage":{"latest_year":2023,"UAE":100.0,"G7_avg":94.653,"G20_avg":89.514,"GCC_avg":98.568,"World_avg":85.176},"Gender parity in high-skilled jobs":{"latest_year":2023,"UAE":20.16,"G7_avg":85.337,"G20_avg":80.016,"GCC_avg":66.095,"World_avg":66.565},"Gender parity in R&D":{"latest_year":2023,"UAE":44.59,"G7_avg":36.184,"G20_avg":52.383,"GCC_avg":48.097,"World_avg":56.969}},"Sustainable Development Goals Index":{"Seats Held By Women In National Parliament (%)":{"latest_year":2024,"UAE":100.0,"G7_avg":58.899,"G20_avg":58.498,"GCC_avg":31.216,"World_avg":51.307},"Seats held by women in national parliament (%)":{"latest_year":2025,"UAE":100.0,"G7_avg":62.09,"G20_avg":59.872,"GCC_avg":31.216,"World_avg":51.551}},"Open Data Inventory Index":{"Gender statistics":{"latest_year":2024,"UAE":80.0,"G7_avg":63.571,"G20_avg":54.412,"GCC_avg":55.833,"World_avg":48.856}},"Social Progress Index":{"Equal Access To Quality Education (0=Unequal; 4=Equal)":{"latest_year":2026,"UAE":82.63,"G7_avg":83.191,"G20_avg":62.244,"GCC_avg":77.798,"World_avg":52.742},"Equal Access To Quality Healthcare (0=Unequal; 4=Equal)":{"latest_year":2026,"UAE":86.55,"G7_avg":78.673,"G20_avg":65.879,"GCC_avg":87.903,"World_avg":52.465}},"Prosperity Index":{"Physical Security Of Women":{"latest_year":2023,"UAE":0.0,"G7_avg":0.667,"G20_avg":0.431,"GCC_avg":0.0,"World_avg":0.319},"Protection Of Women'S Workplace, Education And Family Rights":{"latest_year":2023,"UAE":0.333,"G7_avg":0.695,"G20_avg":0.576,"GCC_avg":0.267,"World_avg":0.551},"Women'S Agency":{"latest_year":2023,"UAE":0.188,"G7_avg":0.902,"G20_avg":0.666,"GCC_avg":0.229,"World_avg":0.504}},"Global Talent Competitiveness Index":{"Economic Empowerment Of Women":{"latest_year":2025,"UAE":82.5,"G7_avg":95.0,"G20_avg":87.344,"GCC_avg":56.977,"World_avg":80.991},"Gender Earnings Gap":{"latest_year":2019,"UAE":12.19,"G7_avg":54.497,"G20_avg":44.634,"GCC_avg":27.838,"World_avg":50.917},"Leadership opportunities for women":{"latest_year":2025,"UAE":77.52,"G7_avg":60.799,"G20_avg":61.524,"GCC_avg":74.198,"World_avg":64.632},"Gender Parity In High-Skilled Jobs":{"latest_year":2025,"UAE":8.84,"G7_avg":88.192,"G20_avg":84.131,"GCC_avg":31.093,"World_avg":71.668},"Leadership Opportunities For Women":{"latest_year":2023,"UAE":75.11,"G7_avg":49.726,"G20_avg":46.836,"GCC_avg":63.475,"World_avg":48.178},"Business Opportunities For Women":{"latest_year":2017,"UAE":74.23,"G7_avg":57.131,"G20_avg":53.627,"GCC_avg":63.345,"World_avg":59.368},"Gender Development Gap":{"latest_year":2020,"UAE":77.56,"G7_avg":80.447,"G20_avg":73.652,"GCC_avg":73.448,"World_avg":71.791}},"The Future of Growth Report":{"Inequality in education 0-100 (highly unequal)":{"latest_year":2024,"UAE":74.7,"G7_avg":90.571,"G20_avg":78.831,"GCC_avg":70.483,"World_avg":67.875}},"Global Gender Gap Report":{"Women in ministerial positions %":{"latest_year":2025,"UAE":0.25,"G7_avg":0.64,"G20_avg":0.491,"GCC_avg":0.184,"World_avg":0.365},"Years with female/male head of state (last 50)":{"latest_year":2025,"UAE":0.0,"G7_avg":0.146,"G20_avg":0.12,"GCC_avg":0.0,"World_avg":0.091},"Women in parliament %":{"latest_year":2025,"UAE":1.0,"G7_avg":0.464,"G20_avg":0.468,"GCC_avg":0.374,"World_avg":0.42}}},"trend_data":{"Women, Business and the Law":{"Is there legislation on sexual harassment in employment?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman sign a contract in the same way as a man?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman work at night in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman get a job in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the law prohibit discrimination in employment based on gender?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman choose where to live in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the law prohibit discrimination in access to credit based on gender?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Do sons and daughters have equal rights to inherit assets from their parents?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Are there criminal penalties or civil remedies for sexual harassment in employment?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman work in a job deemed dangerous in the same way as a man?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the law provide for the valuation of nonmonetary contributions?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Is paid leave of at least 14 weeks available to mothers?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Can a woman register a business in the same way as a man?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is there paid leave available to fathers?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does a woman have the same rights to remarry as a man?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Can a woman travel outside the country in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the government administer 100% of maternity leave benefits?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Can a woman apply for a passport in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Do men and women have equal ownership rights to immovable property?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is the law free of legal provisions that require a married woman to obey her husband?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is dismissal of pregnant workers prohibited?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is there legislation specifically addressing domestic violence?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman obtain a judgment of divorce in the same way as a man?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Do male and female surviving spouses have equal rights to inherit assets?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Is the age at which men and women can retire with full pension benefits the same?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is the mandatory retirement age for men and women the same?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman be head of household in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Are periods of absence due to childcare accounted for in pension benefits?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman open a bank account in the same way as a man?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman work in an industrial job in the same way as a man?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman travel outside her home in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the law grant spouses equal administrative authority over assets during marriage?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the law mandate equal remuneration for work of equal value?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is the age at which men and women can retire with partial pension benefits the same?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is there paid parental leave?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}]},"Future Readiness Economic Index":{"Gender parity in internet usage":[{"year":2023,"score":100.0}],"Gender parity in high-skilled jobs":[{"year":2023,"score":20.16}],"Gender parity in R&D":[{"year":2023,"score":44.59}]},"Sustainable Development Goals Index":{"Seats Held By Women In National Parliament (%)":[{"year":2023,"score":100.0},{"year":2024,"score":100.0}],"Seats held by women in national parliament (%)":[{"year":2025,"score":100.0}]},"Open Data Inventory Index":{"Gender statistics":[{"year":2016,"score":20.0},{"year":2017,"score":45.0},{"year":2018,"score":55.0},{"year":2020,"score":70.0},{"year":2022,"score":80.0},{"year":2024,"score":80.0}]},"Social Progress Index":{"Equal Access To Quality Education (0=Unequal; 4=Equal)":[{"year":2011,"score":3.561},{"year":2012,"score":3.561},{"year":2013,"score":3.561},{"year":2014,"score":3.561},{"year":2015,"score":3.561},{"year":2016,"score":3.561},{"year":2017,"score":3.561},{"year":2018,"score":3.561},{"year":2019,"score":3.561},{"year":2020,"score":3.561},{"year":2021,"score":3.34},{"year":2022,"score":3.549},{"year":2024,"score":88.3},{"year":2025,"score":87.85},{"year":2026,"score":82.63}],"Equal Access To Quality Healthcare (0=Unequal; 4=Equal)":[{"year":2011,"score":3.289},{"year":2012,"score":3.289},{"year":2013,"score":3.289},{"year":2014,"score":3.289},{"year":2015,"score":3.289},{"year":2016,"score":3.289},{"year":2017,"score":3.289},{"year":2018,"score":3.289},{"year":2019,"score":3.289},{"year":2020,"score":3.289},{"year":2021,"score":3.707},{"year":2022,"score":3.707},{"year":2024,"score":92.7},{"year":2025,"score":91.97},{"year":2026,"score":86.55}]},"Prosperity Index":{"Physical Security Of Women":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0}],"Protection Of Women'S Workplace, Education And Family Rights":[{"year":2008,"score":0.467},{"year":2009,"score":0.467},{"year":2010,"score":0.467},{"year":2011,"score":0.333},{"year":2012,"score":0.333},{"year":2013,"score":0.333},{"year":2014,"score":0.333},{"year":2015,"score":0.333},{"year":2016,"score":0.333},{"year":2017,"score":0.333},{"year":2018,"score":0.333},{"year":2019,"score":0.333},{"year":2020,"score":0.333},{"year":2021,"score":0.333},{"year":2022,"score":0.333},{"year":2023,"score":0.333}],"Women'S Agency":[{"year":2008,"score":0.188},{"year":2009,"score":0.188},{"year":2010,"score":0.188},{"year":2011,"score":0.188},{"year":2012,"score":0.188},{"year":2013,"score":0.188},{"year":2014,"score":0.188},{"year":2015,"score":0.188},{"year":2016,"score":0.188},{"year":2017,"score":0.188},{"year":2018,"score":0.188},{"year":2019,"score":0.188},{"year":2020,"score":0.188},{"year":2021,"score":0.188},{"year":2022,"score":0.188},{"year":2023,"score":0.188}]},"Global Talent Competitiveness Index":{"Economic Empowerment Of Women":[{"year":2022,"score":75.22},{"year":2023,"score":75.22},{"year":2025,"score":82.5}],"Gender Earnings Gap":[{"year":2016,"score":0.29},{"year":2017,"score":59.17},{"year":2018,"score":15.66},{"year":2019,"score":12.19}],"Leadership opportunities for women":[{"year":2025,"score":77.52}],"Gender Parity In High-Skilled Jobs":[{"year":2022,"score":16.07},{"year":2023,"score":22.07},{"year":2025,"score":8.84}],"Leadership Opportunities For Women":[{"year":2018,"score":88.17},{"year":2019,"score":93.15},{"year":2020,"score":81.98},{"year":2021,"score":84.52},{"year":2022,"score":86.29},{"year":2023,"score":75.11}],"Business Opportunities For Women":[{"year":2017,"score":74.23}],"Gender Development Gap":[{"year":2020,"score":77.56}]},"The Future of Growth Report":{"Inequality in education 0-100 (highly unequal)":[{"year":2024,"score":74.7}]},"Global Gender Gap Report":{"Women in ministerial positions %":[{"year":2016,"score":0.2},{"year":2017,"score":0.364},{"year":2018,"score":0.364},{"year":2020,"score":0.408},{"year":2021,"score":0.376},{"year":2022,"score":0.375},{"year":2023,"score":0.214},{"year":2024,"score":0.125},{"year":2025,"score":0.25}],"Years with female/male head of state (last 50)":[{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0},{"year":2025,"score":0.0}],"Women in parliament %":[{"year":2016,"score":0.29},{"year":2017,"score":0.29},{"year":2018,"score":0.29},{"year":2020,"score":0.29},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0},{"year":2025,"score":1.0}]}}};
+const DATA = {"bar_data":{"Sustainable Development Goals Index":{"Seats Held By Women In National Parliament (%)":{"latest_year":2024,"UAE":100.0,"G7_avg":58.899,"G20_avg":58.498,"GCC_avg":31.216,"World_avg":51.307,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"50","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Mexico","description":"The Number Of Seats Held By Women In Single Or Lower Chambers Of National Parliaments, Expressed As A Percentage Of All Occupied Seats."},"Seats held by women in national parliament (%)":{"latest_year":2025,"UAE":100.0,"G7_avg":62.09,"G20_avg":59.872,"GCC_avg":31.216,"World_avg":51.551,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"50","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Mexico","description":"The number of seats held by women in single or lower chambers of national parliaments, expressed as a percentage of all occupied seats."}},"Women, Business and the Law":{"Does the law mandate equal remuneration for work of equal value?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.714,"G20_avg":0.529,"GCC_avg":0.5,"World_avg":0.516,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Employers Are Legally Obliged To Pay Equal Remuneration To Male And Female Employees Who Perform Work Of Equal Value."},"Can a woman work in an industrial job in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.706,"GCC_avg":0.833,"World_avg":0.689,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Nonpregnant And Non-Nursing Women Can Work In The Mining, Construction, Manufacturing, Energy, Water, Agriculture, And Transportation Industries In The Same Way As Men."},"Can a woman sign a contract in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.989,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If A Woman Obtains Full Legal Capacity Upon Reaching The Age Of Majority And There Are No Restrictions On Her Signing Legally Binding Contracts."},"Is the age at which men and women can retire with partial pension benefits the same?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.833,"World_avg":0.811,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If The Age At Which Men And Women Can Retire And Receive Partial Pension Benefits Is The Same."},"Does a woman have the same rights to remarry as a man?":{"latest_year":2024,"UAE":0.0,"G7_avg":0.714,"G20_avg":0.765,"GCC_avg":0.0,"World_avg":0.647,"rank":"124","prev_rank":"123","rank_diff":"▼1","value":"-","first_global":"Multiple Countries","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Women And Men Have Equal Rights To Remarry."},"Can a woman work in a job deemed dangerous in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.765,"GCC_avg":0.667,"World_avg":0.763,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If No Laws Prohibit Or Restrict Nonpregnant And Nonnursing Women From Working In Jobs Deemed Hazardous, Arduous, Or Morally Inappropriate."},"Can a woman work at night in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.667,"World_avg":0.895,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Nonpregnant And Non-Nursing Women Can Work At Night In The Same Way As Men."},"Is there paid leave available to fathers?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.667,"World_avg":0.647,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Fathers Are Legally Entitled To At Least One Day Of Paid Paternity Leave."},"Do men and women have equal ownership rights to immovable property?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.9,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Restrictions On Women's Legal Capacity And Rights To Immovable Property."},"Does the law provide for the valuation of nonmonetary contributions?":{"latest_year":2024,"UAE":0.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":0.0,"World_avg":0.705,"rank":"135","prev_rank":"134","rank_diff":"▼1","value":"-","first_global":"Multiple Countries","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"Nonmonetary Contributions Include Caring For Minor Children Or Taking Care Of The Family Home. A Score Of 1 Is Assigned If There Is An Explicit Legal Recognition Of Such Contributions."},"Can a woman obtain a judgment of divorce in the same way as a man?":{"latest_year":2024,"UAE":0.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":0.0,"World_avg":0.763,"rank":"146","prev_rank":"145","rank_diff":"▼1","value":"-","first_global":"Multiple Countries","first_arab":"Tunisia","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If The Process To Obtain A Judgment Of Divorce Is Equal For Women And Men."},"Is paid leave of at least 14 weeks available to mothers?":{"latest_year":2024,"UAE":0.0,"G7_avg":0.857,"G20_avg":0.706,"GCC_avg":0.167,"World_avg":0.647,"rank":"124","prev_rank":"119","rank_diff":"▼5","value":"-","first_global":"Multiple Countries","first_arab":"Multiple Countries","first_gcc":"Oman","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Mothers Are Legally Entitled To At Least 14 Weeks Of Paid Leave For The Birth Of A Child."},"Can a woman travel outside her home in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":0.333,"World_avg":0.926,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Restrictions On A Woman Traveling Alone Domestically."},"Is there paid parental leave?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.588,"GCC_avg":0.167,"World_avg":0.289,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Parents Are Legally Entitled To Some Form Of Full-Time Paid Parental Leave."},"Is dismissal of pregnant workers prohibited?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.667,"World_avg":0.811,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If The Law Explicitly Prohibits The Dismissal Of Pregnant Women."},"Can a woman travel outside the country in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.5,"World_avg":0.947,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Restrictions On A Woman Traveling Alone Internationally."},"Can a woman choose where to live in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.167,"World_avg":0.821,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Restrictions On A Woman Choosing Where To Live."},"Are there criminal penalties or civil remedies for sexual harassment in employment?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.882,"GCC_avg":0.667,"World_avg":0.737,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If The Law Establishes Criminal Sanctions Or Civil Remedies For Sexual Harassment In Employment."},"Can a woman apply for a passport in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.858,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Gender Differences In Passport Application Procedures."},"Does the law prohibit discrimination in access to credit based on gender?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.647,"GCC_avg":0.5,"World_avg":0.495,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If The Law Prohibits Discrimination By Creditors Based On Sex Or Gender."},"Do sons and daughters have equal rights to inherit assets from their parents?":{"latest_year":2024,"UAE":0.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":0.0,"World_avg":0.784,"rank":"150","prev_rank":"150","rank_diff":"►0","value":"-","first_global":"Multiple Countries","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Sons And Daughters Have The Same Rights To Inherit Assets From Their Parents."},"Does the law grant spouses equal administrative authority over assets during marriage?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.905,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Spouses Retain Administrative Power Over The Assets Each Brought To The Marriage."},"Are periods of absence due to childcare accounted for in pension benefits?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.588,"GCC_avg":0.5,"World_avg":0.574,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Pension Contributions Are Paid Or Credited During Maternity Or Parental Leave."},"Does the law prohibit discrimination in employment based on gender?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":0.667,"World_avg":0.853,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If The Law Prohibits Employers From Discriminating Based On Sex Or Gender."},"Does the government administer 100% of maternity leave benefits?":{"latest_year":2024,"UAE":0.0,"G7_avg":0.857,"G20_avg":0.765,"GCC_avg":0.0,"World_avg":0.511,"rank":"98","prev_rank":"100","rank_diff":"▲2","value":"-","first_global":"Multiple Countries","first_arab":"Multiple Countries","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Leave Benefits Are Fully Administered By A Government Entity."},"Is the law free of legal provisions that require a married woman to obey her husband?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.333,"World_avg":0.905,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Is No Provision Requiring A Married Woman To Obey Her Husband."},"Can a woman open a bank account in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.968,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Restrictions On A Woman Opening A Bank Account."},"Is there legislation on sexual harassment in employment?":{"latest_year":2024,"UAE":1.0,"G7_avg":0.857,"G20_avg":0.941,"GCC_avg":0.833,"World_avg":0.795,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Legal Provisions Specifically Protect Against Sexual Harassment In Employment."},"Is the mandatory retirement age for men and women the same?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":1.0,"World_avg":0.921,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If The Legally Established Age At Which Men And Women Must Retire Is The Same."},"Is there legislation specifically addressing domestic violence?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":0.667,"World_avg":0.868,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Is Legislation Addressing Domestic Violence That Includes Criminal Sanctions."},"Can a woman get a job in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":0.5,"World_avg":0.9,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Restrictions On A Woman's Legal Capacity And Ability To Get A Job."},"Can a woman register a business in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":1.0,"GCC_avg":1.0,"World_avg":0.974,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Restrictions On A Woman Registering A Business."},"Can a woman be head of household in the same way as a man?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.941,"GCC_avg":0.833,"World_avg":0.853,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If There Are No Restrictions On A Woman Being Head Of Household."},"Do male and female surviving spouses have equal rights to inherit assets?":{"latest_year":2024,"UAE":0.0,"G7_avg":1.0,"G20_avg":0.882,"GCC_avg":0.0,"World_avg":0.774,"rank":"148","prev_rank":"148","rank_diff":"►0","value":"-","first_global":"Multiple Countries","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If Surviving Spouses Of Either Gender With No Living Children Have The Same Inheritance Rights."},"Is the age at which men and women can retire with full pension benefits the same?":{"latest_year":2024,"UAE":1.0,"G7_avg":1.0,"G20_avg":0.765,"GCC_avg":0.667,"World_avg":0.674,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Score Of 1 Is Assigned If The Statutory Age At Which Men And Women Can Retire And Receive An Old-Age Pension Is The Same."}},"Prosperity Index":{"Protection Of Women'S Workplace, Education And Family Rights":{"latest_year":2023,"UAE":0.333,"G7_avg":0.695,"G20_avg":0.576,"GCC_avg":0.267,"World_avg":0.551,"rank":"132","prev_rank":"132","rank_diff":"►0","value":"10","first_global":"Sweden","first_arab":"Comoros","first_gcc":"United Arab Emirates","first_g20":"Canada","description":"A Composite Measure Of The Degree To Which Women Receive Protections From Discrimination In A Society."},"Physical Security Of Women":{"latest_year":2023,"UAE":0.0,"G7_avg":0.667,"G20_avg":0.431,"GCC_avg":0.0,"World_avg":0.319,"rank":"105","prev_rank":"105","rank_diff":"►0","value":"4","first_global":"Multiple Countries","first_arab":"Multiple Countries","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"A Composite Measure Of The Physical Security Of Women Within A Country."},"Women'S Agency":{"latest_year":2023,"UAE":0.188,"G7_avg":0.902,"G20_avg":0.666,"GCC_avg":0.229,"World_avg":0.504,"rank":"129","prev_rank":"129","rank_diff":"►0","value":"13","first_global":"Multiple Countries","first_arab":"Comoros","first_gcc":"Bahrain","first_g20":"Australia","description":"A Composite Measure Of The Degree To Which Women Experience Agency."}},"Global Talent Competitiveness Index":{"Leadership Opportunities For Women":{"latest_year":2023,"UAE":75.11,"G7_avg":49.726,"G20_avg":46.836,"GCC_avg":63.475,"World_avg":48.178,"rank":"12","prev_rank":"8","rank_diff":"▼4","value":"5.620","first_global":"Albania","first_arab":"Egypt","first_gcc":"United Arab Emirates","first_g20":"Saudi Arabia","description":"Average Answer To The Question: In Your Country, To What Extent Do Companies Provide Women With The Same Opportunities As Men To Rise To Positions Of Leadership?"},"Gender Parity In High-Skilled Jobs":{"latest_year":2025,"UAE":8.84,"G7_avg":88.192,"G20_avg":84.131,"GCC_avg":31.093,"World_avg":71.668,"rank":"116","prev_rank":"119","rank_diff":"▲3","value":"0.280","first_global":"Argentina","first_arab":"Lebanon","first_gcc":"Kuwait","first_g20":"Argentina","description":"Gender Parity In High-Skilled Jobs Refers To The Ratio Of Managers, Professionals, Or Technicians Who Are Female To Those Who Are Male."},"Business Opportunities For Women":{"latest_year":2017,"UAE":74.23,"G7_avg":57.131,"G20_avg":53.627,"GCC_avg":63.345,"World_avg":59.368,"rank":"10","prev_rank":"-","rank_diff":"-","value":"5.450","first_global":"Rwanda","first_arab":"Qatar","first_gcc":"Qatar","first_g20":"Canada","description":"Composite indicator measuring business opportunities available to women."},"Economic Empowerment Of Women":{"latest_year":2025,"UAE":82.5,"G7_avg":95.0,"G20_avg":87.344,"GCC_avg":56.977,"World_avg":80.991,"rank":"72","prev_rank":"69","rank_diff":"▼3","value":"82.500","first_global":"Multiple Countries","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Multiple Countries","description":"The Women, Business And The Law Index - A Composite Indicator Measuring Gender Equality With Respect To Legal Rights In Economic Participation."},"Gender Earnings Gap":{"latest_year":2019,"UAE":12.19,"G7_avg":54.497,"G20_avg":44.634,"GCC_avg":27.838,"World_avg":50.917,"rank":"112","prev_rank":"105","rank_diff":"▼7","value":"0.270","first_global":"Burundi","first_arab":"Bahrain","first_gcc":"Bahrain","first_g20":"France","description":"The Estimated Earned Income Ratio Refers To The Estimated Income Earned By Females Over The Corresponding Value For Males."},"Leadership opportunities for women":{"latest_year":2025,"UAE":77.52,"G7_avg":60.799,"G20_avg":61.524,"GCC_avg":74.198,"World_avg":64.632,"rank":"16","prev_rank":"-","rank_diff":"-","value":"5.650","first_global":"Lithuania","first_arab":"Bahrain","first_gcc":"Bahrain","first_g20":"Saudi Arabia","description":"Average answer: In your country, to what extent do companies give equal opportunities to rise to positions of leadership to women?"},"Gender Development Gap":{"latest_year":2020,"UAE":77.56,"G7_avg":80.447,"G20_avg":73.652,"GCC_avg":73.448,"World_avg":71.791,"rank":"66","prev_rank":"-","rank_diff":"-","value":"0.970","first_global":"Qatar","first_arab":"Qatar","first_gcc":"Qatar","first_g20":"Russia","description":"The Gender Development Index (GDI) measures disparities between women and men in health, knowledge, and living standards."}},"Social Progress Index":{"Equal Access To Quality Healthcare (0=Unequal; 4=Equal)":{"latest_year":2026,"UAE":86.55,"G7_avg":78.673,"G20_avg":65.879,"GCC_avg":87.903,"World_avg":52.465,"rank":"31","prev_rank":"14","rank_diff":"▼17","value":"3.462","first_global":"Denmark","first_arab":"Qatar","first_gcc":"Qatar","first_g20":"Japan","description":"Country experts' aggregated evaluation: To what extent is high quality basic healthcare guaranteed to all?"},"Equal Access To Quality Education (0=Unequal; 4=Equal)":{"latest_year":2026,"UAE":82.63,"G7_avg":83.191,"G20_avg":62.244,"GCC_avg":77.798,"World_avg":52.742,"rank":"33","prev_rank":"23","rank_diff":"▼10","value":"3.305","first_global":"Norway","first_arab":"Qatar","first_gcc":"Qatar","first_g20":"Japan","description":"Country experts' aggregated evaluation: To what extent is high quality basic education guaranteed to all?"}},"Future Readiness Economic Index":{"Gender parity in high-skilled jobs":{"latest_year":2023,"UAE":20.16,"G7_avg":85.337,"G20_avg":80.016,"GCC_avg":66.095,"World_avg":66.565,"rank":"113","prev_rank":"-","rank_diff":"-","value":"0.384","first_global":"Greece","first_arab":"Oman","first_gcc":"Oman","first_g20":"Germany","description":"Gender Parity In High-Skilled Jobs - Ratio Of Female Managers, Professionals, Or Technicians To Male."},"Gender parity in internet usage":{"latest_year":2023,"UAE":100.0,"G7_avg":94.653,"G20_avg":89.514,"GCC_avg":98.568,"World_avg":85.176,"rank":"1","prev_rank":"-","rank_diff":"-","value":"1","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"South Africa","description":"Gender Parity In Internet Use - Ratio Of Female Internet Users To Male Internet Users."},"Gender parity in R&D":{"latest_year":2023,"UAE":44.59,"G7_avg":36.184,"G20_avg":52.383,"GCC_avg":48.097,"World_avg":56.969,"rank":"66","prev_rank":"-","rank_diff":"-","value":"0.506","first_global":"Mongolia","first_arab":"Lebanon","first_gcc":"Qatar","first_g20":"Mexico","description":"Gender Parity In R&D - Ratio Of Female R&D Personnel To Male R&D Personnel."}},"The Future of Growth Report":{"Inequality in education 0-100 (highly unequal)":{"latest_year":2024,"UAE":74.7,"G7_avg":90.571,"G20_avg":78.831,"GCC_avg":70.483,"World_avg":67.875,"rank":"56","prev_rank":"-","rank_diff":"-","value":"12.600","first_global":"Czechia","first_arab":"Qatar","first_gcc":"Qatar","first_g20":"Canada","description":"Inequality in distribution of years of schooling. Higher score = more equal."}},"Global Gender Gap Report":{"Women in ministerial positions %":{"latest_year":2025,"UAE":0.25,"G7_avg":0.64,"G20_avg":0.491,"GCC_avg":0.184,"World_avg":0.365,"rank":"81","prev_rank":"116","rank_diff":"▲35","value":"-","first_global":"Multiple Countries","first_arab":"Morocco","first_gcc":"Bahrain","first_g20":"United Kingdom","description":"Percentage Of Women Holding Ministerial Portfolios As A Share Of Total Ministry Positions."},"Years with female/male head of state (last 50)":{"latest_year":2025,"UAE":0.0,"G7_avg":0.146,"G20_avg":0.12,"GCC_avg":0.0,"World_avg":0.091,"rank":"81","prev_rank":"80","rank_diff":"▼1","value":"-","first_global":"Multiple Countries","first_arab":"Tunisia","first_gcc":"United Arab Emirates","first_g20":"Germany","description":"Number Of Years In The Past Fifty-Year Period For Which A Woman Has Held A Post Equivalent To An Elected Head Of State."},"Women in parliament %":{"latest_year":2025,"UAE":1.0,"G7_avg":0.464,"G20_avg":0.468,"GCC_avg":0.374,"World_avg":0.42,"rank":"1","prev_rank":"1","rank_diff":"►0","value":"-","first_global":"United Arab Emirates","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"Mexico","description":"Percentage Of Women Holding Parliamentary Seats As A Share Of Total Parliamentary Seats."}},"Open Data Inventory Index":{"Gender statistics":{"latest_year":2024,"UAE":80.0,"G7_avg":63.571,"G20_avg":54.412,"GCC_avg":55.833,"World_avg":48.856,"rank":"8","prev_rank":"5","rank_diff":"▼3","value":"-","first_global":"Multiple Countries","first_arab":"United Arab Emirates","first_gcc":"United Arab Emirates","first_g20":"United States","description":"Open Data Inventory score for gender statistics availability and quality."}}},"trend_data":{"Sustainable Development Goals Index":{"Seats Held By Women In National Parliament (%)":[{"year":2023,"score":100.0},{"year":2024,"score":100.0}],"Seats held by women in national parliament (%)":[{"year":2025,"score":100.0}]},"Women, Business and the Law":{"Does the law mandate equal remuneration for work of equal value?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman work in an industrial job in the same way as a man?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman sign a contract in the same way as a man?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is the age at which men and women can retire with partial pension benefits the same?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does a woman have the same rights to remarry as a man?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Can a woman work in a job deemed dangerous in the same way as a man?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman work at night in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is there paid leave available to fathers?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Do men and women have equal ownership rights to immovable property?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the law provide for the valuation of nonmonetary contributions?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Can a woman obtain a judgment of divorce in the same way as a man?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Is paid leave of at least 14 weeks available to mothers?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Can a woman travel outside her home in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is there paid parental leave?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is dismissal of pregnant workers prohibited?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman travel outside the country in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman choose where to live in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Are there criminal penalties or civil remedies for sexual harassment in employment?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman apply for a passport in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the law prohibit discrimination in access to credit based on gender?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Do sons and daughters have equal rights to inherit assets from their parents?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Does the law grant spouses equal administrative authority over assets during marriage?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Are periods of absence due to childcare accounted for in pension benefits?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the law prohibit discrimination in employment based on gender?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Does the government administer 100% of maternity leave benefits?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Is the law free of legal provisions that require a married woman to obey her husband?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman open a bank account in the same way as a man?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is there legislation on sexual harassment in employment?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is the mandatory retirement age for men and women the same?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Is there legislation specifically addressing domestic violence?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman get a job in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman register a business in the same way as a man?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Can a woman be head of household in the same way as a man?":[{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}],"Do male and female surviving spouses have equal rights to inherit assets?":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0}],"Is the age at which men and women can retire with full pension benefits the same?":[{"year":2008,"score":1.0},{"year":2009,"score":1.0},{"year":2010,"score":1.0},{"year":2011,"score":1.0},{"year":2012,"score":1.0},{"year":2013,"score":1.0},{"year":2014,"score":1.0},{"year":2015,"score":1.0},{"year":2016,"score":1.0},{"year":2017,"score":1.0},{"year":2018,"score":1.0},{"year":2019,"score":1.0},{"year":2020,"score":1.0},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0}]},"Prosperity Index":{"Protection Of Women'S Workplace, Education And Family Rights":[{"year":2008,"score":0.467},{"year":2009,"score":0.467},{"year":2010,"score":0.467},{"year":2011,"score":0.333},{"year":2012,"score":0.333},{"year":2013,"score":0.333},{"year":2014,"score":0.333},{"year":2015,"score":0.333},{"year":2016,"score":0.333},{"year":2017,"score":0.333},{"year":2018,"score":0.333},{"year":2019,"score":0.333},{"year":2020,"score":0.333},{"year":2021,"score":0.333},{"year":2022,"score":0.333},{"year":2023,"score":0.333}],"Physical Security Of Women":[{"year":2008,"score":0.0},{"year":2009,"score":0.0},{"year":2010,"score":0.0},{"year":2011,"score":0.0},{"year":2012,"score":0.0},{"year":2013,"score":0.0},{"year":2014,"score":0.0},{"year":2015,"score":0.0},{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2019,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0}],"Women'S Agency":[{"year":2008,"score":0.188},{"year":2009,"score":0.188},{"year":2010,"score":0.188},{"year":2011,"score":0.188},{"year":2012,"score":0.188},{"year":2013,"score":0.188},{"year":2014,"score":0.188},{"year":2015,"score":0.188},{"year":2016,"score":0.188},{"year":2017,"score":0.188},{"year":2018,"score":0.188},{"year":2019,"score":0.188},{"year":2020,"score":0.188},{"year":2021,"score":0.188},{"year":2022,"score":0.188},{"year":2023,"score":0.188}]},"Global Talent Competitiveness Index":{"Leadership Opportunities For Women":[{"year":2018,"score":88.17},{"year":2019,"score":93.15},{"year":2020,"score":81.98},{"year":2021,"score":84.52},{"year":2022,"score":86.29},{"year":2023,"score":75.11}],"Gender Parity In High-Skilled Jobs":[{"year":2022,"score":16.07},{"year":2023,"score":22.07},{"year":2025,"score":8.84}],"Business Opportunities For Women":[{"year":2017,"score":74.23}],"Economic Empowerment Of Women":[{"year":2022,"score":75.22},{"year":2023,"score":75.22},{"year":2025,"score":82.5}],"Gender Earnings Gap":[{"year":2016,"score":0.29},{"year":2017,"score":59.17},{"year":2018,"score":15.66},{"year":2019,"score":12.19}],"Leadership opportunities for women":[{"year":2025,"score":77.52}],"Gender Development Gap":[{"year":2020,"score":77.56}]},"Social Progress Index":{"Equal Access To Quality Healthcare (0=Unequal; 4=Equal)":[{"year":2011,"score":3.289},{"year":2012,"score":3.289},{"year":2013,"score":3.289},{"year":2014,"score":3.289},{"year":2015,"score":3.289},{"year":2016,"score":3.289},{"year":2017,"score":3.289},{"year":2018,"score":3.289},{"year":2019,"score":3.289},{"year":2020,"score":3.289},{"year":2021,"score":3.707},{"year":2022,"score":3.707},{"year":2024,"score":92.7},{"year":2025,"score":91.97},{"year":2026,"score":86.55}],"Equal Access To Quality Education (0=Unequal; 4=Equal)":[{"year":2011,"score":3.561},{"year":2012,"score":3.561},{"year":2013,"score":3.561},{"year":2014,"score":3.561},{"year":2015,"score":3.561},{"year":2016,"score":3.561},{"year":2017,"score":3.561},{"year":2018,"score":3.561},{"year":2019,"score":3.561},{"year":2020,"score":3.561},{"year":2021,"score":3.34},{"year":2022,"score":3.549},{"year":2024,"score":88.3},{"year":2025,"score":87.85},{"year":2026,"score":82.63}]},"Future Readiness Economic Index":{"Gender parity in high-skilled jobs":[{"year":2023,"score":20.16}],"Gender parity in internet usage":[{"year":2023,"score":100.0}],"Gender parity in R&D":[{"year":2023,"score":44.59}]},"The Future of Growth Report":{"Inequality in education 0-100 (highly unequal)":[{"year":2024,"score":74.7}]},"Global Gender Gap Report":{"Women in ministerial positions %":[{"year":2016,"score":0.2},{"year":2017,"score":0.364},{"year":2018,"score":0.364},{"year":2020,"score":0.408},{"year":2021,"score":0.376},{"year":2022,"score":0.375},{"year":2023,"score":0.214},{"year":2024,"score":0.125},{"year":2025,"score":0.25}],"Years with female/male head of state (last 50)":[{"year":2016,"score":0.0},{"year":2017,"score":0.0},{"year":2018,"score":0.0},{"year":2020,"score":0.0},{"year":2021,"score":0.0},{"year":2022,"score":0.0},{"year":2023,"score":0.0},{"year":2024,"score":0.0},{"year":2025,"score":0.0}],"Women in parliament %":[{"year":2016,"score":0.29},{"year":2017,"score":0.29},{"year":2018,"score":0.29},{"year":2020,"score":0.29},{"year":2021,"score":1.0},{"year":2022,"score":1.0},{"year":2023,"score":1.0},{"year":2024,"score":1.0},{"year":2025,"score":1.0}]},"Open Data Inventory Index":{"Gender statistics":[{"year":2016,"score":20.0},{"year":2017,"score":45.0},{"year":2018,"score":55.0},{"year":2020,"score":70.0},{"year":2022,"score":80.0},{"year":2024,"score":80.0}]}}};
 
-const BLUES = ['#0d3b8e','#1a5fbc','#2e80d4','#5aa8e8','#9ccbf4'];
-const BLUES_BORDER = ['#0a2d70','#145099','#2570be','#4898d8','#8cbbec'];
-let barChart = null, trendChart = null;
+// ── country counts per report ────────────────────────────────────────
+const REPORT_COUNTRIES = {
+  "Future Readiness Economic Index": 124,
+  "Global Gender Gap Report": 162,
+  "Global Talent Competitiveness Index": 145,
+  "Open Data Inventory Index": 200,
+  "Prosperity Index": 167,
+  "Social Progress Index": 171,
+  "Sustainable Development Goals Index": 167,
+  "The Future of Growth Report": 107,
+  "Women, Business and the Law": 190
+};
+const BLUES=['#0d3b8e','#1a5fbc','#2e80d4','#5aa8e8','#9ccbf4'];
+const BLUES_B=['#0a2d70','#145099','#2570be','#4898d8','#8cbbec'];
+let barChart=null,trnChart=null;
 
-function fmt(v) {
-  if (v === null || v === undefined) return '—';
-  if (v >= 100) return v.toFixed(1);
-  if (v >= 10)  return v.toFixed(1);
-  if (v >= 1)   return v.toFixed(2);
-  return v.toFixed(3);
+function fmt(v){
+  if(v===null||v===undefined)return'—';
+  if(v>=100)return v.toFixed(1);if(v>=10)return v.toFixed(1);
+  if(v>=1)return v.toFixed(2);return v.toFixed(3);
+}
+function diff(uae,bench,el){
+  if(uae===null||bench===null){el.textContent='';return;}
+  const d=uae-bench,a=Math.abs(d);
+  el.textContent=(d>0.001?'▲ +':d<-0.001?'▼ -':'= ')+fmt(a)+' vs UAE';
+  el.className='kpi-diff '+(d>0.001?'pos':d<-0.001?'neg':'neu');
 }
 
-function diffLabel(uae, bench, el) {
-  if (uae === null || bench === null) { el.textContent = ''; return; }
-  const d = uae - bench;
-  const abs = Math.abs(d);
-  el.textContent = (d > 0.001 ? '▲ +' : d < -0.001 ? '▼ -' : '= ') + fmt(abs) + ' vs UAE';
-  el.className = 'kpi-diff ' + (d > 0.001 ? 'pos' : d < -0.001 ? 'neg' : 'neu');
+// ── tab switching ────────────────────────────────────────────────────
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  if(id==='details')renderTable();
 }
 
-function init() {
-  const reports = Object.keys(DATA.bar_data);
-  const allInds = new Set(reports.flatMap(r => Object.keys(DATA.bar_data[r])));
-  document.getElementById('countReports').textContent = reports.length;
-  document.getElementById('countIndicators').textContent = allInds.size;
+// ── INIT ─────────────────────────────────────────────────────────────
+function init(){
+  const reports=Object.keys(DATA.bar_data);
+  const allInds=new Set(reports.flatMap(r=>Object.keys(DATA.bar_data[r])));
+  document.getElementById('cR').textContent=reports.length;
+  document.getElementById('cI').textContent=allInds.size;
+  document.getElementById('cC').textContent='205';
 
-  const rSel = document.getElementById('reportFilter');
-  reports.forEach(r => { const o = document.createElement('option'); o.value = o.textContent = r; rSel.appendChild(o); });
+  // Dashboard filters
+  const rS=document.getElementById('rSel');
+  reports.forEach(r=>{const o=document.createElement('option');o.value=o.textContent=r;rS.appendChild(o);});
+  fillInds(reports[0]);
 
-  fillIndicators(reports[0]);
-  updateDashboard();
+  // Table report filter
+  const tS=document.getElementById('tblRSel');
+  const allOpt=document.createElement('option');allOpt.value='';allOpt.textContent='All Reports';tS.appendChild(allOpt);
+  reports.forEach(r=>{const o=document.createElement('option');o.value=o.textContent=r;tS.appendChild(o);});
+
+  render();
 }
 
-function fillIndicators(report) {
-  const sel = document.getElementById('indicatorFilter');
-  sel.innerHTML = '';
-  Object.keys(DATA.bar_data[report] || {}).forEach(ind => {
-    const o = document.createElement('option'); o.value = o.textContent = ind; sel.appendChild(o);
+function fillInds(report){
+  const s=document.getElementById('iSel');s.innerHTML='';
+  Object.keys(DATA.bar_data[report]||{}).sort().forEach(i=>{
+    const o=document.createElement('option');o.value=o.textContent=i;s.appendChild(o);
   });
 }
+function onReport(){fillInds(document.getElementById('rSel').value);render();}
 
-function onReportChange() { fillIndicators(document.getElementById('reportFilter').value); updateDashboard(); }
-function onIndicatorChange() { updateDashboard(); }
+// ── DASHBOARD RENDER ─────────────────────────────────────────────────
+function render(){
+  const report=document.getElementById('rSel').value;
+  const ind=document.getElementById('iSel').value;
+  const bd=DATA.bar_data[report]?.[ind];
+  const td=DATA.trend_data[report]?.[ind];
+  if(!bd)return;
 
-function updateDashboard() {
-  const report = document.getElementById('reportFilter').value;
-  const ind    = document.getElementById('indicatorFilter').value;
-  const bd = DATA.bar_data[report]?.[ind];
-  const td = DATA.trend_data[report]?.[ind];
-  if (!bd) return;
+  document.getElementById('k-uae').textContent=fmt(bd.UAE);
+  document.getElementById('k-g7').textContent=fmt(bd.G7_avg);
+  document.getElementById('k-g20').textContent=fmt(bd.G20_avg);
+  document.getElementById('k-gcc').textContent=fmt(bd.GCC_avg);
+  document.getElementById('k-wld').textContent=fmt(bd.World_avg);
+  document.getElementById('k-yr').textContent='Latest: '+bd.latest_year;
+  diff(bd.UAE,bd.G7_avg,document.getElementById('d-g7'));
+  diff(bd.UAE,bd.G20_avg,document.getElementById('d-g20'));
+  diff(bd.UAE,bd.GCC_avg,document.getElementById('d-gcc'));
+  diff(bd.UAE,bd.World_avg,document.getElementById('d-wld'));
 
-  document.getElementById('kpi-uae').textContent   = fmt(bd.UAE);
-  document.getElementById('kpi-g7').textContent    = fmt(bd.G7_avg);
-  document.getElementById('kpi-g20').textContent   = fmt(bd.G20_avg);
-  document.getElementById('kpi-gcc').textContent   = fmt(bd.GCC_avg);
-  document.getElementById('kpi-world').textContent = fmt(bd.World_avg);
-  document.getElementById('kpi-year').textContent  = 'Latest: ' + bd.latest_year;
-  diffLabel(bd.UAE, bd.G7_avg,    document.getElementById('kpi-diff-g7'));
-  diffLabel(bd.UAE, bd.G20_avg,   document.getElementById('kpi-diff-g20'));
-  diffLabel(bd.UAE, bd.GCC_avg,   document.getElementById('kpi-diff-gcc'));
-  diffLabel(bd.UAE, bd.World_avg, document.getElementById('kpi-diff-world'));
-  document.getElementById('bar-subtitle').textContent = `"${ind.length > 60 ? ind.slice(0,60)+'…' : ind}" — ${bd.latest_year}`;
+  // RANK KPI
+  const totalCtry = REPORT_COUNTRIES[report] || '—';
+  document.getElementById('k-rank').textContent = bd.rank || '—';
+  document.getElementById('k-rank-of').textContent = bd.rank && bd.rank !== '-' ? 'of ' + totalCtry : '';
+  document.getElementById('k-ctry').textContent = totalCtry;
+  document.getElementById('k-ctry-lbl').textContent = report.length > 30 ? report.slice(0,30)+'…' : report;
+  const prev=bd.prev_rank,diff_r=bd.rank_diff||'';
+  document.getElementById('rank-prev').textContent=prev&&prev!=='-'?'Prev: '+prev:'';
+  const arrowEl=document.getElementById('rank-arrow');
+  if(diff_r.includes('▲')){arrowEl.textContent='▲ Improved';arrowEl.className='rank-arrow up';}
+  else if(diff_r.includes('▼')){arrowEl.textContent='▼ Dropped';arrowEl.className='rank-arrow down';}
+  else{arrowEl.textContent=diff_r==='►0'?'► No change':'';arrowEl.className='rank-arrow same';}
 
-  // ── BAR CHART ──
-  if (barChart) barChart.destroy();
-  document.getElementById('barNoData').style.display = 'none';
-  document.getElementById('barChart').style.display  = 'block';
+  document.getElementById('bar-sub').textContent=`"${ind.length>60?ind.slice(0,60)+'…':ind}" — ${bd.latest_year}`;
 
-  const vals   = [bd.UAE, bd.G7_avg, bd.G20_avg, bd.GCC_avg, bd.World_avg];
-  const labels = ['🇦🇪 UAE', 'G7 Avg', 'G20 Avg', 'GCC Avg', 'World Avg'];
-
-  // custom data-label plugin
-  const dataLabelPlugin = {
-    id: 'dataLabels',
-    afterDatasetsDraw(chart) {
-      const { ctx, data } = chart;
-      ctx.save();
-      data.datasets.forEach((ds, di) => {
-        chart.getDatasetMeta(di).data.forEach((bar, ji) => {
-          const v = ds.data[ji];
-          if (v === null || v === undefined) return;
-          ctx.font = `600 11px 'DM Sans', sans-serif`;
-          ctx.fillStyle = BLUES[ji];
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'bottom';
-          ctx.fillText(fmt(v), bar.x, bar.y - 5);
-        });
-      });
-      ctx.restore();
-    }
-  };
-
-  barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
-    type: 'bar',
-    plugins: [dataLabelPlugin],
-    data: { labels, datasets: [{ data: vals, backgroundColor: BLUES, borderColor: BLUES_BORDER, borderWidth: 1.5, borderRadius: 7, borderSkipped: false }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 24 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#fff', borderColor: '#dde4ef', borderWidth: 1,
-          titleColor: '#1a2340', bodyColor: '#0d3b8e', padding: 10,
-          callbacks: { label: ctx => '  Score: ' + fmt(ctx.parsed.y) }
-        }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: '#7a8aaa', font: { family: 'DM Sans', size: 12, weight: '500' } } },
-        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#7a8aaa', font: { family: 'DM Sans', size: 11 } }, beginAtZero: true }
-      }
-    }
+  // Description + Firsts
+  document.getElementById('info-desc').textContent=bd.description||'No description available.';
+  const fc=document.getElementById('info-firsts');fc.innerHTML='';
+  const firsts=[['🌐 Global',bd.first_global],['🌍 Arab',bd.first_arab],['🏳️ GCC',bd.first_gcc],['🏭 G20',bd.first_g20]];
+  firsts.forEach(([label,val])=>{
+    if(!val||val==='-')return;
+    const d=document.createElement('div');d.className='first-badge';
+    d.innerHTML=`<span>${label}</span>${val}`;fc.appendChild(d);
   });
 
-  // ── TREND CHART ──
-  if (trendChart) trendChart.destroy();
-  if (!td || td.length < 2) {
-    document.getElementById('trendNoData').style.display = 'flex';
-    document.getElementById('trendChart').style.display  = 'none';
-    return;
+  // BAR CHART
+  if(barChart)barChart.destroy();
+  document.getElementById('barND').style.display='none';
+  document.getElementById('barC').style.display='block';
+  const dlPlugin={id:'dl',afterDatasetsDraw(c){
+    const{ctx,data}=c;ctx.save();
+    data.datasets.forEach((ds,di)=>{c.getDatasetMeta(di).data.forEach((bar,ji)=>{
+      const v=ds.data[ji];if(v===null)return;
+      ctx.font="600 11px 'Calibri', 'Sakkal Majalla', sans-serif";ctx.fillStyle=BLUES[ji];
+      ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillText(fmt(v),bar.x,bar.y-4);
+    });});ctx.restore();
+  }};
+  barChart=new Chart(document.getElementById('barC').getContext('2d'),{
+    type:'bar',plugins:[dlPlugin],
+    data:{labels:['🇦🇪 UAE','G7 Avg','G20 Avg','GCC Avg','World Avg'],
+      datasets:[{data:[bd.UAE,bd.G7_avg,bd.G20_avg,bd.GCC_avg,bd.World_avg],
+        backgroundColor:BLUES,borderColor:BLUES_B,borderWidth:1.5,borderRadius:7,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:22}},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#dde4ef',borderWidth:1,
+        titleColor:'#1a2340',bodyColor:'#0d3b8e',padding:10,
+        callbacks:{label:c=>'  Score: '+fmt(c.parsed.y)}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#7a8aaa',font:{family:'Calibri, Sakkal Majalla, sans-serif',size:12,weight:'500'}}},
+        y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#7a8aaa',font:{family:'Calibri, Sakkal Majalla, sans-serif',size:11}},beginAtZero:true}}}
+  });
+
+  // TREND CHART
+  if(trnChart)trnChart.destroy();
+  if(!td||td.length<2){
+    document.getElementById('trnND').style.display='flex';
+    document.getElementById('trnC').style.display='none';return;
   }
-  document.getElementById('trendNoData').style.display = 'none';
-  document.getElementById('trendChart').style.display  = 'block';
-
-  const tYears  = td.map(d => d.year);
-  const tScores = td.map(d => d.score);
-  document.getElementById('trend-subtitle').textContent = `UAE trajectory · ${tYears[0]} – ${tYears[tYears.length-1]}`;
-
-  const tCtx = document.getElementById('trendChart').getContext('2d');
-  const grad = tCtx.createLinearGradient(0, 0, 0, 300);
-  grad.addColorStop(0, 'rgba(13,59,142,0.12)');
-  grad.addColorStop(1, 'rgba(13,59,142,0.01)');
-
-  trendChart = new Chart(tCtx, {
-    type: 'line',
-    data: { labels: tYears, datasets: [{ label: 'UAE Score', data: tScores, borderColor: '#0d3b8e', backgroundColor: grad, borderWidth: 2.5, pointBackgroundColor: '#0d3b8e', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 7, fill: true, tension: 0.35 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { backgroundColor: '#fff', borderColor: '#dde4ef', borderWidth: 1, titleColor: '#7a8aaa', bodyColor: '#0d3b8e', padding: 10, callbacks: { label: ctx => '  UAE: ' + fmt(ctx.parsed.y) } }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: '#7a8aaa', font: { family: 'DM Sans', size: 11 }, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#7a8aaa', font: { family: 'DM Sans', size: 11 } } }
-      }
-    }
+  document.getElementById('trnND').style.display='none';
+  document.getElementById('trnC').style.display='block';
+  const tY=td.map(d=>d.year),tS=td.map(d=>d.score);
+  document.getElementById('trnd-sub').textContent=`UAE trajectory · ${tY[0]} – ${tY[tY.length-1]}`;
+  const tCtx=document.getElementById('trnC').getContext('2d');
+  const g=tCtx.createLinearGradient(0,0,0,280);
+  g.addColorStop(0,'rgba(13,59,142,0.13)');g.addColorStop(1,'rgba(13,59,142,0.01)');
+  trnChart=new Chart(tCtx,{type:'line',
+    data:{labels:tY,datasets:[{label:'UAE',data:tS,borderColor:'#0d3b8e',backgroundColor:g,
+      borderWidth:2.5,pointBackgroundColor:'#0d3b8e',pointBorderColor:'#fff',pointBorderWidth:2,
+      pointRadius:4,pointHoverRadius:7,fill:true,tension:0.35}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#dde4ef',
+        borderWidth:1,titleColor:'#7a8aaa',bodyColor:'#0d3b8e',padding:10,
+        callbacks:{label:c=>'  UAE: '+fmt(c.parsed.y)}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#7a8aaa',font:{family:'Calibri, Sakkal Majalla, sans-serif',size:11},maxTicksLimit:10}},
+        y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#7a8aaa',font:{family:'Calibri, Sakkal Majalla, sans-serif',size:11}}}}}
   });
+}
+
+// ── TABLE RENDER ─────────────────────────────────────────────────────
+function rankChangeHTML(diff_r){
+  if(!diff_r||diff_r==='-')return'<span class="rank-chg same">—</span>';
+  if(diff_r.includes('▲')){const n=diff_r.replace('▲','').trim();return`<span class="rank-chg up">▲ ${n}</span>`;}
+  if(diff_r.includes('▼')){const n=diff_r.replace('▼','').trim();return`<span class="rank-chg down">▼ ${n}</span>`;}
+  return`<span class="rank-chg same">►</span>`;
+}
+function renderTable(){
+  const filterR=document.getElementById('tblRSel').value;
+  const search=(document.getElementById('tblSearch').value||'').toLowerCase();
+  const tbody=document.getElementById('tblBody');tbody.innerHTML='';
+  let count=0;
+  Object.entries(DATA.bar_data).forEach(([report,inds])=>{
+    if(filterR&&report!==filterR)return;
+    Object.entries(inds).forEach(([ind,bd])=>{
+      if(search&&!ind.toLowerCase().includes(search)&&!report.toLowerCase().includes(search))return;
+      count++;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>
+          <div class="tbl-report">${report}</div>
+          <div class="tbl-indicator">${ind}</div>
+        </td>
+        <td class="num"><span class="year-chip">${bd.latest_year}</span></td>
+        <td class="num"><span class="score-chip">${fmt(bd.UAE)}</span></td>
+        <td class="num"><span class="rank-chip">${bd.rank&&bd.rank!=='-'?'#'+bd.rank:'—'}</span></td>
+        <td class="num">${rankChangeHTML(bd.rank_diff)}</td>
+        <td><div class="first-cell">${bd.first_global||'—'}</div></td>
+        <td><div class="first-cell">${bd.first_arab||'—'}</div></td>
+        <td><div class="first-cell">${bd.first_gcc||'—'}</div></td>
+        <td><div class="first-cell">${bd.first_g20||'—'}</div></td>`;
+      tbody.appendChild(tr);
+    });
+  });
+  if(count===0){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td colspan="9" class="no-rows">No indicators match your search.</td>`;
+    tbody.appendChild(tr);
+  }
 }
 
 init();
